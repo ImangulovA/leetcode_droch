@@ -53,7 +53,42 @@ class Solution:
         return True
 
 
-
+    def myAtoi(self, s: str) -> int:
+        s = list(s)
+        a = 0
+        sign = 1
+        signm = False
+        while len(s) > 0:
+            if s[0] == ' ':
+                if signm == True:
+                    return 0
+                s.pop(0)
+            elif s[0] == '+':
+                if signm == True:
+                    return 0
+                s.pop(0)
+                signm = True
+            elif s[0] == '-':
+                if signm == True:
+                    return 0
+                s.pop(0)
+                sign = -1
+                signm = True
+            elif (s[0] >= '0') & (s[0] <= '9'):
+                    while (s[0] >= '0') & (s[0] <= '9'):
+                        a = a*10 + int(s[0])
+                        s.pop(0)
+                        if a > (2 ** 31 - 1):
+                            if sign == 1:
+                                return 2 ** 31 - 1
+                            else:
+                                return - 2 ** 31
+                        if len(s) == 0:
+                            break
+                    return a*sign
+            else:
+                return 0
+        return 0
 
 
 
@@ -61,6 +96,8 @@ s = ["H","a","n","n","a","h"]
 s = "anagram"
 t = "nagaram"
 s = "A man, a plan, a canal: Panama"
+s = "   +-42sfdgergh"
+t = '       '
 ob1 = Solution()
 # print(ob1.reverse(-123))
 # print(ob1.firstUniqChar(s))
@@ -68,3 +105,4 @@ ob1 = Solution()
 # print(ob1.ourcounter(list(s)))
 # print(ob1.isAnagram(s,t))
 # print(ob1.isPalindrome(s))
+print(ob1.myAtoi(s))
