@@ -90,14 +90,58 @@ class Solution:
                 return 0
         return 0
 
+    def strStr(self, haystack: str, needle: str) -> int:
+        lh = len(haystack)
+        ln = len(needle)
+        if ln > lh:
+            return -1
+        if ln == 0:
+            return -1
+        if lh == 0:
+            return -1
+        for k in range(lh-ln+1):
+            if haystack[k]==needle[0]:
+                sfsg = True
+                for l in range(1,ln):
+                    if haystack[k+l] != needle[l]:
+                        sfsg = False
+                        break
+                if sfsg:
+                    return k
+        return -1
+
+    def longestCommonPrefix(self, strs: List[str]) -> str:
+        lcp = ''
+        if len(strs)==0:
+            return lcp
+        lcpcont = True
+        chrnum = 0
+        while lcpcont:
+            try:
+                ch = strs[0][chrnum]
+                for s in strs[1:]:
+                    if s[chrnum] != ch:
+                        lcpcont = False
+                        return lcp
+                lcp += ch
+                chrnum += 1
+            except:
+                return lcp
 
 
-s = ["H","a","n","n","a","h"]
-s = "anagram"
-t = "nagaram"
-s = "A man, a plan, a canal: Panama"
-s = "   +-42sfdgergh"
-t = '       '
+
+
+
+
+# s = ["H","a","n","n","a","h"]
+# s = "anagram"
+# t = "nagaram"
+# s = "A man, a plan, a canal: Panama"
+# s = "   +-42sfdgergh"
+# t = '       '
+# haystack = "saqwdbutsadssssssssssssssss"
+# needle = "ssssssss"
+strs = ["flower", "f", "fwerlight"]
 ob1 = Solution()
 # print(ob1.reverse(-123))
 # print(ob1.firstUniqChar(s))
@@ -105,4 +149,6 @@ ob1 = Solution()
 # print(ob1.ourcounter(list(s)))
 # print(ob1.isAnagram(s,t))
 # print(ob1.isPalindrome(s))
-print(ob1.myAtoi(s))
+# print(ob1.myAtoi(s))
+# print(ob1.strStr(haystack, needle))
+print(ob1.longestCommonPrefix(strs))
