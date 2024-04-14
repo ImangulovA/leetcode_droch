@@ -89,3 +89,78 @@ sum(amount) trans_total_amount,
 sum(amount * (state = 'approved')) approved_total_amount
 from transactions
 group by 1,2
+
+# 1174. Immediate Food Delivery II
+with fq as (
+    select customer_id, min(order_date) order_date
+    from Delivery
+    group by 1
+)
+select round(100 * sum(order_date = customer_pref_delivery_date) / count(*),2) as immediate_percentage
+from Delivery d
+join fq using (customer_id,order_date)
+
+# 550. Game Play Analysis IV
+with pretable_a as (select player_id, min(event_date) as min_date
+from activity a
+group by player_id)
+select round(sum(b.player_id is not null)/count(*),2) as fraction
+from pretable_a pa
+left join activity b on pa.player_id = b.player_id
+and pa.min_date + interval 1 day = b.event_date
+
+# 1141. User Activity for the Past 30 Days I
+select activity_date day, count(distinct user_id) active_users
+from activity
+where activity_date <= '2019-07-27'
+and activity_date > '2019-07-27' - interval 30 day
+group by activity_date
+
+# 1070. Product Sales Analysis III
+with pretable as (select
+product_id, min(year) year
+from Sales
+group by product_id)
+select  s.product_id, s.year first_year, s.quantity, s.price
+from Sales s
+join pretable p using(product_id, year)
+
+# 596. Classes More Than 5 Students
+select class
+from courses
+group by class
+having count(distinct student) >= 5
+
+
+# 1729. Find Followers Count
+select user_id, count(distinct follower_id) followers_count
+from Followers
+group by 1
+
+# 619. Biggest Single Number
+with uniq as
+(select num
+from MyNumbers
+group by num
+having count(*) = 1)
+select max(num) num
+from uniq
+
+# 1045. Customers Who Bought All Products
+select customer_id
+from Customer
+group by customer_id
+having count(distinct product_key) = (select count(distinct product_key) from Product)
+
+
+# 1731. The Number of Employees Which Report to Each Employee
+with mantable as (
+    select reports_to employee_id, count(*) reports_count, round(avg(age),0) average_age
+    from employees
+    where reports_to is not null
+    group by reports_to
+)
+select e.employee_id, e.name, reports_count, average_age
+from employees e
+join mantable using(employee_id)
+order by e.employee_id
