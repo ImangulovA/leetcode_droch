@@ -164,3 +164,145 @@ select e.employee_id, e.name, reports_count, average_age
 from employees e
 join mantable using(employee_id)
 order by e.employee_id
+
+# 180. Consecutive Numbers
+select l0.num ConsecutiveNums
+from logs l0
+join logs l1 on l0.id = l1.id - 1
+join logs l2 on l0.id = l2.id - 2
+where l0.num = l1.num and l0.num = l2.num
+group by 1
+
+# 1204. Last Person to Fit in the Bus
+with pt as (
+select turn, weight, sum(weight) over (order by turn) sw
+from Queue
+)
+select person_name
+from queue
+where turn = (select max(turn)
+from pt
+where sw <= 1000
+)
+
+# 1907. Count Salary Categories
+select "Low Salary" as category, sum(case when income < 20000 then 1 else 0 end) as accounts_count
+From Accounts
+union
+select "Average Salary" as category, sum(case when income between 20000 and 50000 then 1 else 0 end) as accounts_count
+From Accounts
+union
+select "High Salary" as category, sum(case when income > 50000 then 1 else 0 end) as accounts_count
+from Accounts
+
+# 1978. Employees Whose Manager Left the Company
+select e.employee_id
+from Employees e
+left join Employees m on e.manager_id = m.employee_id
+where e.manager_id is not null
+and m.employee_id is null
+and e.salary < 30000
+
+# 1321. Restaurant Growth
+with pt as
+(
+    select visited_on, sum(amount) sa, count(*) ca, 1 techcol
+    from customer
+    group by visited_on
+), pt2 as
+(
+select visited_on, sum(sa) over w amount,
+round(sum(sa) over w/7,2) average_amount
+from pt
+window w as (
+    ORDER BY visited_on ROWS BETWEEN 6 PRECEDING AND 0 FOLLOWING
+    )
+)
+select *
+from pt2
+where visited_on > (
+    select min(visited_on)+ interval 5 day
+    from customer
+    )
+
+# 602. Friend Requests II: Who Has the Most Friends
+WITH cte AS (
+SELECT requester_id as id, COUNT(requester_id) as count
+FROM RequestAccepted
+GROUP BY requester_id
+UNION ALL
+SELECT accepter_id as id, COUNT(accepter_id) as count
+FROM RequestAccepted
+GROUP BY accepter_id
+)
+SELECT id, SUM(count) as num
+FROM cte
+GROUP BY id
+ORDER BY num DESC
+LIMIT 1;
+
+# 585. Investments in 2016
+with ul as
+(
+    select lat, lon
+ from Insurance
+ group by 1,2
+ having count(*) = 1
+),  ct as
+(
+    select tiv_2015
+    from Insurance
+    group by 1
+    having count(*) > 1
+)
+select round(sum(tiv_2016),2) tiv_2016
+from Insurance
+join ul using(lat,lon)
+join ct using(tiv_2015)
+
+# 185. Department Top Three Salaries
+with pt as
+(
+    select departmentId, salary, rank() over (partition by departmentId order by salary desc) srank
+    from Employee
+    group by 1,2
+)
+select d.name Department, e.name Employee, e.salary
+from Employee e
+join pt using (departmentId, salary)
+join Department d on d.id = e.departmentId
+where pt.srank <= 3
+
+# 1527. Patients With a Condition
+select *
+from patients
+where left(conditions,5) = 'DIAB1' or conditions like '% DIAB1%'
+
+# 196. Delete Duplicate Emails
+
+with pt as (
+    select id, email, rank() over (partition by email order by id asc) srank
+from person
+)
+delete
+from person
+where id in (select id from pt where srank > 1)
+
+# 176. Second Highest Salary
+with pt as
+(
+    select salary, rank() over (order by salary desc) srank
+    from (select salary from Employee group by 1) e
+)
+select salary SecondHighestSalary
+from pt
+where srank = 2
+union
+select null SecondHighestSalary
+limit 1
+
+_____
+
+select max(salary) as SecondHighestSalary from Employee
+where salary <(select max(salary) from employee);
+
