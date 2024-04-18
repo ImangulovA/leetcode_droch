@@ -306,3 +306,28 @@ _____
 select max(salary) as SecondHighestSalary from Employee
 where salary <(select max(salary) from employee);
 
+# 1484. Group Sold Products By The Date
+with nd as (
+    select sell_date, product
+    from activities
+    order by 1,2
+)
+select sell_date, count(*) num_sold,  GROUP_CONCAT(product order by product SEPARATOR ',') products
+from nd
+group by 1
+order by 1
+
+# 1327. List the Products Ordered in a Period
+with pt as (
+select product_id, sum(unit) unit
+from orders
+where year(order_date) = 2020 and month(order_date) = 2
+group by product_id
+having unit >= 100
+)
+select  product_name, unit
+from Products
+join pt using (product_id)
+
+# 1517. Find Users With Valid E-Mails
+select * from Users where right(mail, 13) like "@leetcode.com" and left(mail, length(mail)-13) rlike '^[A-Za-z][A-Za-z0-9._-]*$'
