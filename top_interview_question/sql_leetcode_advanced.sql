@@ -72,4 +72,8 @@ group by 1,3
 order by student_id
 -- row number / rank is WAY more efficient
 
---
+--175. Combine Two Tables
+select
+p.firstname, p.lastname, a.city, a.state
+from Person p
+left join Address A using(personId)
