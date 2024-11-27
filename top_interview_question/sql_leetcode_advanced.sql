@@ -137,3 +137,23 @@ from sales
 group by 1
 order by 1
 
+-- 1607. Sellers With No Sales
+select seller_name
+from seller
+where seller_id not in (
+select distinct seller_id from Orders
+where extract(year from sale_date) = 2020
+)
+order by 1
+
+-- 1747. Leetflex Banned Accounts
+select distinct ip1.account_id
+from LogInfo ip1
+join LogInfo ip2 on ip1.account_id = ip2.account_id
+and ip1.ip_address <> ip2.ip_address
+and (
+    --time cases
+    (ip1.login >= ip2.login and ip1.login <= ip2.logout)
+    OR
+    (ip2.login >= ip1.login and ip2.login <= ip1.logout)
+)
