@@ -95,3 +95,15 @@ from student s
 join alwaysquiet a using(student_id)
 where a.ever_loud = 0
 
+-- 1693. Daily Leads and Partners
+select date_id, make_name, count(distinct lead_id) unique_leads,
+count(distinct partner_id) unique_partners
+from dailysales
+group by 1,2
+
+-- 1965. Employees With Missing Information
+select coalesce(e.employee_id, s.employee_id) as employee_id
+from employees e
+full outer join salaries s using(employee_id)
+where e.name is null or s.salary is null
+order by 1
