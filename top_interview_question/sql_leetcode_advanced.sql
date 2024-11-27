@@ -61,3 +61,15 @@ left join comordsales c using (sales_id)
 where c.sales_id is null
 -- not in subquery is more efficient
 
+--1112. Highest Grade For Each Student
+with pt as (select student_id, max(grade) as grade
+from enrollments
+group by 1)
+select e.student_id, min(e.course_id) as course_id, e.grade
+from enrollments e
+inner join pt using(student_id, grade)
+group by 1,3
+order by student_id
+-- row number / rank is WAY more efficient
+
+--
