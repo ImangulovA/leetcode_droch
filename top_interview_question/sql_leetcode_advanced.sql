@@ -181,3 +181,31 @@ select p.project_id, e.employee_id
 from Project p
 join most_years my using (project_id)
 join employee e on p.employee_id = e.employee_id and e.experience_years = my.experience_years
+
+-- 1596. The Most Frequently Ordered Products for Each Customer
+with frequent_buy as (
+    select customer_id, product_id, count(distinct order_id) num_of_orders from orders
+    group by 1,2
+),
+most_often as
+(
+    select *, rank() over(partition by customer_id order by num_of_orders desc) burank
+    from frequent_buy
+)
+select mo.customer_id, mo.product_id, p.product_name
+from most_often mo
+join products p using (product_id)
+where mo.burank = 1
+
+-- 1767. Find the Subtasks That Did Not Execute
+with gentask as
+(select subtask_id
+from generate_series(1,20) subtask_id
+)
+select
+task_id, subtask_id
+from tasks
+cross join gentask g
+left join executed e using (task_id, subtask_id)
+where g.subtask_id <= subtasks_count
+and e.task_id is null
