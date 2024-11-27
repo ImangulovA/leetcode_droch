@@ -77,3 +77,21 @@ select
 p.firstname, p.lastname, a.city, a.state
 from Person p
 left join Address A using(personId)
+
+-- 1412. Find the Quiet Students in All Exams
+with minmax as (select exam_id, min(score) as min_score, max(score) as max_score
+from exam
+group by exam_id),
+louddetect as (select e.exam_id, e.student_id,
+case when e.score = mm.min_score or e.score = mm.max_score then True
+else False end as loud
+from exam e
+join minmax mm using(exam_id)),
+alwaysquiet as (select student_id, max(loud) ever_loud
+from louddetect
+group by 1)
+select s.*
+from student s
+join alwaysquiet a using(student_id)
+where a.ever_loud = 0
+
