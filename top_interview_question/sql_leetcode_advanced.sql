@@ -107,3 +107,14 @@ from employees e
 full outer join salaries s using(employee_id)
 where e.name is null or s.salary is null
 order by 1
+
+-- 184. Department Highest Salary
+-- Write your PostgreSQL query statement below
+with maxdep as (
+    select departmentId, max(salary) salary from employee
+    group by 1
+)
+select d.name as Department, e.name as Employee, e.salary
+from employee e
+inner join maxdep using(departmentId, salary)
+inner join department d on d.id = e.departmentId
