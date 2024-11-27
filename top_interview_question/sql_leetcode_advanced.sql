@@ -118,3 +118,22 @@ select d.name as Department, e.name as Employee, e.salary
 from employee e
 inner join maxdep using(departmentId, salary)
 inner join department d on d.id = e.departmentId
+
+-- 1532. The Most Recent Three Orders
+with orderrank as (select order_id, order_date, customer_id, rank() over(partition by customer_id order by order_date desc) orderrank
+from orders
+)
+select c.name as customer_name, c.customer_id, o.order_id, o.order_date from
+orderrank o
+join customers c using(customer_id)
+where o.orderrank <= 3
+order by c.name, c.customer_id, o.order_date desc
+
+-- 1445. Apples & Oranges
+select sale_date,
+sum(sold_num) filter(where fruit = 'apples')
+- sum(sold_num) filter(where fruit = 'oranges') as diff
+from sales
+group by 1
+order by 1
+
