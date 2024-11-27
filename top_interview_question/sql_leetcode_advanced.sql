@@ -157,3 +157,27 @@ and (
     OR
     (ip2.login >= ip1.login and ip2.login <= ip1.logout)
 )
+
+-- 1699. Number of Calls Between Two Persons
+select
+case when from_id < to_id then from_id
+else to_id end as person1,
+case when from_id > to_id then from_id
+else to_id end as person2,
+count(*) as call_count,
+sum(duration) as total_duration
+from calls
+group by 1,2
+
+-- 1077. Project Employees III
+with most_years as
+(
+    select p.project_id, max(experience_years) experience_years
+    from Employee e
+    right join Project p using(employee_id)
+    group by 1
+)
+select p.project_id, e.employee_id
+from Project p
+join most_years my using (project_id)
+join employee e on p.employee_id = e.employee_id and e.experience_years = my.experience_years
