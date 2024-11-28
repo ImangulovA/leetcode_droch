@@ -313,3 +313,28 @@ select employee_id
 from cte
 where employee_id!=1
 order by 1;
+
+-- 1225. Report Contiguous Dates
+with failpt as (select fail_date,
+dayofyear(fail_date) - row_number() over(order by fail_date) timegroup
+from failed
+where year(fail_date) = 2019
+),
+successpt as (select success_date,
+dayofyear(success_date) - row_number() over(order by success_date) timegroup
+from succeeded
+where year(success_date) = 2019),
+pt as (select 'failed' as period_state,
+min(fail_date) as start_date,
+max(fail_date) as end_date
+from failpt
+group by timegroup
+union
+select 'succeeded' as period_state,
+min(success_date) as start_date,
+max(success_date) as end_date
+from successpt
+group by timegroup)
+select *
+from pt
+order by start_date
