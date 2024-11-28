@@ -209,3 +209,23 @@ cross join gentask g
 left join executed e using (task_id, subtask_id)
 where g.subtask_id <= subtasks_count
 and e.task_id is null
+
+-- 603. Consecutive Available Seats
+with free as (select seat_id
+from cinema
+where free = 1)
+select f1.seat_id
+from free f1
+left join free f2 on f1.seat_id = f2.seat_id + 1
+left join free f3 on f1.seat_id = f3.seat_id - 1
+where f2.seat_id is not null or f3.seat_id is not null
+order by f1.seat_id
+
+-- 608. Tree Node
+select t.id,
+case when parent.id is null then 'Root'
+when child.p_id is not null then 'Inner'
+else 'Leaf' end as type
+from tree t
+left join tree parent on t.p_id = parent.id
+left join (select distinct p_id from tree) child on t.id = child.p_id
