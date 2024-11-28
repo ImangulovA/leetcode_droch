@@ -301,30 +301,15 @@ group by loggroup
 order by start_id
 
 -- 1270. All People Report to the Given Manager
-with direct_reports as
-(
-    select employee_id
-    from employees
-    where manager_id = 1
-    and employee_id <> 1
-),
-indirect_reports as
-(
-    select employee_id
-    from employees
-    where manager_id in (select employee_id from direct_reports)
-),
-inindirect_reports as
-(
-    select employee_id
-    from employees
-    where manager_id in (select employee_id from indirect_reports)
+with recursive cte as (
+    select *
+    from Employees where employee_id=1
+    union
+    select e.*
+    from cte c
+    join Employees e on c.employee_id=e.manager_id
 )
 select employee_id
-from direct_reports
-union all
-select employee_id
-from indirect_reports
-union all
-select employee_id
-from inindirect_reports
+from cte
+where employee_id!=1
+order by 1;
