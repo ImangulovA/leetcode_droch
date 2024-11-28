@@ -267,3 +267,64 @@ select user_id, max(next_v_day - visit_date)  as biggest_window
 from lead_windows
 group by 1
 order by 1
+
+-- 613. Shortest Distance in a Line
+with pt as (select x, lead(x,1) over (order by x) nx
+from point)
+select min(nx - x) shortest
+from pt
+
+--1501. Countries You Can Safely Invest In
+SELECT
+ co.name AS country
+FROM
+ person p
+ JOIN
+     country co
+     ON SUBSTRING(phone_number,1,3) = country_code
+ JOIN
+     calls c
+     ON p.id IN (c.caller_id, c.callee_id)
+GROUP BY
+ co.name
+HAVING
+ AVG(duration) > (SELECT AVG(duration) FROM calls)
+
+-- 1285. Find the Start and End Number of Continuous Ranges
+with pt as (select
+log_id,
+log_id - row_number() over (order by log_id) as loggroup
+from logs)
+select min(log_id) as start_id, max(log_id) as end_id
+from pt
+group by loggroup
+order by start_id
+
+-- 1270. All People Report to the Given Manager
+with direct_reports as
+(
+    select employee_id
+    from employees
+    where manager_id = 1
+    and employee_id <> 1
+),
+indirect_reports as
+(
+    select employee_id
+    from employees
+    where manager_id in (select employee_id from direct_reports)
+),
+inindirect_reports as
+(
+    select employee_id
+    from employees
+    where manager_id in (select employee_id from indirect_reports)
+)
+select employee_id
+from direct_reports
+union all
+select employee_id
+from indirect_reports
+union all
+select employee_id
+from inindirect_reports
