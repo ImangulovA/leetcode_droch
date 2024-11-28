@@ -229,3 +229,41 @@ else 'Leaf' end as type
 from tree t
 left join tree parent on t.p_id = parent.id
 left join (select distinct p_id from tree) child on t.id = child.p_id
+
+-- 1890. The Latest Login in 2020
+select user_id, max(time_stamp ) last_stamp
+from logins
+where extract(year from time_stamp) = 2020
+group by 1
+
+-- 1264. Page Recommendations
+select
+distinct page_id recommended_page
+from
+likes
+where user_id in (select
+    user2_id as user_id
+    from friendship
+    where user1_id = 1
+    UNION
+    select
+    user1_id as user_id
+    from friendship
+    where user2_id = 1)
+and page_id not in (
+select page_id recommended_page
+from
+likes
+where user_id = 1
+)
+
+-- 1709. Biggest Window Between Visits
+with lead_windows as (
+select user_id, visit_date,
+coalesce(lead(visit_date, 1) over (partition by user_id order by visit_date), '2021-01-01') as next_v_day
+from uservisits
+)
+select user_id, max(next_v_day - visit_date)  as biggest_window
+from lead_windows
+group by 1
+order by 1
