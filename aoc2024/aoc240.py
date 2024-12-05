@@ -7,7 +7,8 @@ if prod:
     with open('C:/Users/Amal Imangulov/Downloads/input.txt', 'r') as f:
         lines = f.readlines()
 else:
-    lines = []
+    lines = """""".split("""
+""")
 
 for line in lines:
     print(line)
