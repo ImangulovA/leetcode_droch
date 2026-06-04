@@ -26,6 +26,7 @@ folder maps to a kind of prep I was doing for a given interview loop.
 | [`lc25/`](#lc25) | LeetCode easy/medium set + HackerRank SQL | Python, SQL |
 | [`aoc2022/`](#advent-of-code) | Advent of Code 2022, days 1-16 | Python |
 | [`aoc2024/`](#advent-of-code) | Advent of Code 2024, days 1-19 | Python |
+| [`notes/`](notes) | Interview checklist — what to check first ([EN](notes/interview_checklist_en.md) / [RU](notes/interview_checklist_ru.md)) | Markdown |
 
 ---
 
