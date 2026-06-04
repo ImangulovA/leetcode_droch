@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BFS on Grids · interactive</title>
+<style>
+:root{
+  --bg:#0a0e1a; --card:#151d30; --text:#e6edf7; --muted:#8595ad;
+  --accent:#1877F2; --green:#02e2ac; --orange:#f59e0b; --purple:#a855f7; --gold:#ffd33d;
+  --open:#1b2538; --border:#243049;
+}
+[data-theme="light"]{
+  --bg:#f5f7fb; --card:#ffffff; --text:#0c1426; --muted:#5a6b85; --open:#eef2f9; --border:#dbe3f0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:980px;margin:0 auto;padding:0 20px}
+header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.hbar{display:flex;align-items:center;gap:14px;padding:14px 20px;max-width:980px;margin:0 auto}
+.hbar .tag{background:var(--accent);color:#fff;font-weight:800;border-radius:7px;padding:3px 9px;font-size:13px}
+.hbar h1{font-size:17px;font-weight:700;flex:1}
+.btn{background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:8px 12px;font-weight:600;cursor:pointer;font-size:14px}
+.hero{text-align:center;padding:50px 0 24px}
+.hero h2{font-size:34px;line-height:1.15;margin-bottom:12px}
+.hero h2 span{color:var(--accent)}
+.hero p{color:var(--muted);max-width:640px;margin:0 auto;font-size:17px}
+.primer{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin:28px 0}
+.primer h3{font-size:18px;margin-bottom:10px}
+.primer ol{margin:10px 0 4px 20px}
+.primer li{margin:6px 0}
+.primer b{color:var(--green)}
+.tmpl{background:#0b1120;color:#dfe7f5;border-radius:10px;padding:14px 16px;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;white-space:pre;overflow:auto;margin-top:14px;border:1px solid var(--border)}
+.tmpl .k{color:#ff9d6b}.tmpl .c{color:#5b698a}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:10px 0 40px}
+@media(max-width:780px){.cards{grid-template-columns:1fr}}
+.card{display:block;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;transition:.18s}
+.card:hover{transform:translateY(-4px);border-color:var(--accent)}
+.card .no{font-size:12px;font-weight:800;color:var(--accent);letter-spacing:.05em}
+.card h4{font-size:18px;margin:6px 0 8px}
+.card p{color:var(--muted);font-size:14px}
+.card .pill{display:inline-block;margin-top:12px;font-size:12px;font-weight:700;color:var(--orange);background:color-mix(in srgb,var(--orange) 14%,transparent);border-radius:20px;padding:4px 10px}
+.mini{display:grid;gap:3px;margin:14px 0 4px;width:max-content}
+.mini i{width:15px;height:15px;border-radius:3px;display:inline-block}
+.foot{color:var(--muted);font-size:13px;padding:24px 0 50px;text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <div class="hbar">
+    <span class="tag">BFS</span>
+    <h1>Breadth-First Search on grids</h1>
+    <a class="btn" target="_blank" href="https://github.com/ImangulovA/leetcode_droch">repo ↗</a>
+    <button class="btn" id="theme">◐</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <h2>BFS, but you can <span>watch it spread</span></h2>
+    <p>Three classic grid problems, each with a step-by-step animation: the queue, the
+    expanding frontier, visited cells, and the matching code line. Press play, or step through
+    with the arrow keys.</p>
+  </div>
+
+  <div class="primer">
+    <h3>The one mental model behind all of these</h3>
+    <p>BFS explores a grid in <b>rings of equal distance</b> from where it started. You keep a
+    <b>queue</b> (first-in, first-out). You pop a cell, look at its neighbours, and push the ones
+    you haven't seen yet. Because you always finish the closer cells before the farther ones, BFS
+    naturally answers "<i>shortest</i>" and "<i>how many layers</i>" questions.</p>
+    <ol>
+      <li><b>Seed</b> the queue with your start cell(s), and mark them seen.</li>
+      <li><b>Pop</b> the front. Process it.</li>
+      <li><b>Push</b> each valid, unseen neighbour; mark it seen <i>when you push it</i> (not when you pop it - that's the classic bug that revisits cells).</li>
+      <li>Repeat until the queue is empty.</li>
+    </ol>
+    <div class="tmpl"><span class="c"># the grid-BFS skeleton you reuse every time</span>
+<span class="k">from</span> collections <span class="k">import</span> deque
+q = deque(starts)
+seen = set(starts)
+<span class="k">while</span> q:
+    r, c = q.popleft()
+    <span class="k">for</span> dr, dc <span class="k">in</span> DIRS:        <span class="c"># 4-dir or 8-dir</span>
+        nr, nc = r+dr, c+dc
+        <span class="k">if</span> in_bounds(nr,nc) <span class="k">and</span> passable(nr,nc) <span class="k">and</span> (nr,nc) <span class="k">not in</span> seen:
+            seen.add((nr,nc))
+            q.append((nr,nc))</div>
+  </div>
+
+  <div class="cards">
+    <a class="card" href="200_number_of_islands.html">
+      <div class="no">200 · EASY-MED</div>
+      <h4>Number of Islands</h4>
+      <p>Count connected blobs of land. BFS flood-fills each island so it's counted once.</p>
+      <div class="mini" style="grid-template-columns:repeat(4,15px)">
+        <i style="background:var(--green)"></i><i style="background:var(--open)"></i><i style="background:var(--green)"></i><i style="background:var(--open)"></i>
+        <i style="background:var(--open)"></i><i style="background:var(--green)"></i><i style="background:var(--open)"></i><i style="background:var(--green)"></i>
+      </div>
+      <span class="pill">connectivity · flood fill</span>
+    </a>
+    <a class="card" href="994_rotting_oranges.html">
+      <div class="no">994 · MEDIUM</div>
+      <h4>Rotting Oranges</h4>
+      <p>Rot spreads each minute. Multi-source BFS: all sources start in the queue, layers = time.</p>
+      <div class="mini" style="grid-template-columns:repeat(4,15px)">
+        <i style="background:var(--orange)"></i><i style="background:hsl(56 75% 52%)"></i><i style="background:var(--green)"></i><i style="background:var(--green)"></i>
+        <i style="background:hsl(56 75% 52%)"></i><i style="background:var(--green)"></i><i style="background:var(--open)"></i><i style="background:var(--green)"></i>
+      </div>
+      <span class="pill">multi-source · levels = time</span>
+    </a>
+    <a class="card" href="1091_shortest_path_binary_matrix.html">
+      <div class="no">1091 · MEDIUM</div>
+      <h4>Shortest Path in Binary Matrix</h4>
+      <p>Corner to corner in 8 directions. The first time BFS hits the goal is the shortest path.</p>
+      <div class="mini" style="grid-template-columns:repeat(4,15px)">
+        <i style="background:var(--purple)"></i><i style="background:var(--gold)"></i><i style="background:var(--blocked,#27324a)"></i><i style="background:var(--accent)"></i>
+        <i style="background:var(--accent)"></i><i style="background:var(--gold)"></i><i style="background:var(--accent)"></i><i style="background:var(--gold)"></i>
+      </div>
+      <span class="pill">shortest path · 8-dir</span>
+    </a>
+  </div>
+
+  <div class="foot">
+    Part of <a style="color:var(--accent)" href="https://github.com/ImangulovA/leetcode_droch">leetcode_droch</a>.
+    Tip: <b>seed all sources first</b> for multi-source; <b>mark seen on push</b>, not on pop.
+  </div>
+</div>
+<script>
+const t=document.getElementById('theme');
+t.onclick=()=>{const v=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=v;localStorage.bfsTheme=v;};
+if(localStorage.bfsTheme)document.documentElement.dataset.theme=localStorage.bfsTheme;
+</script>
+</body>
+</html>

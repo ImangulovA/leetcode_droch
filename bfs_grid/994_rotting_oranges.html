@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BFS · 994 Rotting Oranges</title>
+<style>
+:root{
+  --bg:#0a0e1a; --card:#151d30; --text:#e6edf7; --muted:#8595ad;
+  --accent:#1877F2; --green:#02e2ac; --orange:#f59e0b; --purple:#a855f7; --gold:#ffd33d;
+  --water:#10204a; --land:#c9b896; --open:#1b2538; --blocked:#27324a;
+  --border:#243049;
+}
+[data-theme="light"]{
+  --bg:#f5f7fb; --card:#ffffff; --text:#0c1426; --muted:#5a6b85;
+  --water:#bcd2ff; --land:#e3d3a8; --open:#eef2f9; --blocked:#c3cde0; --border:#dbe3f0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5;padding-bottom:60px}
+a{color:var(--accent);text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.hbar{display:flex;align-items:center;gap:14px;padding:14px 20px;max-width:1180px;margin:0 auto}
+.hbar .tag{background:var(--accent);color:#fff;font-weight:800;border-radius:7px;padding:3px 9px;font-size:13px}
+.hbar h1{font-size:17px;font-weight:700;flex:1}
+.hbar h1 small{color:var(--muted);font-weight:500}
+.btn{background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:8px 12px;font-weight:600;cursor:pointer;font-size:14px;transition:.15s}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.intro{margin:26px 0 18px}
+.intro h2{font-size:24px;margin-bottom:8px}
+.intro p{color:var(--muted);max-width:760px}
+.idea{background:var(--card);border:1px solid var(--border);border-left:4px solid var(--green);border-radius:12px;padding:16px 18px;margin:18px 0}
+.idea b{color:var(--green)}
+.stage{display:grid;grid-template-columns:1.1fr .9fr;gap:20px;margin-top:8px}
+@media(max-width:900px){.stage{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
+.panel h3{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:10px}
+#grid{display:grid;gap:6px}
+.cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;font-weight:800;font-size:clamp(11px,2.2vw,18px);border:2px solid transparent;transition:background .25s,transform .15s,box-shadow .25s;position:relative}
+.base-water{background:var(--water);color:#6f8fd0}
+.base-land{background:var(--land);color:#2a2118}
+.base-open{background:var(--open);color:var(--muted)}
+.base-empty{background:var(--open);color:var(--muted)}
+.base-blocked{background:var(--blocked);color:#6679a0}
+.base-fresh{background:var(--green);color:#03301f}
+.base-rotten{background:var(--orange);color:#3a2300}
+.algo-frontier{border-color:var(--orange);box-shadow:0 0 0 3px color-mix(in srgb,var(--orange) 35%,transparent);animation:pulse 1.1s infinite}
+.algo-current{border-color:var(--accent);box-shadow:0 0 18px var(--accent);transform:scale(1.07);z-index:2}
+.algo-visited{filter:saturate(.85)}
+.algo-source{border-color:var(--purple);box-shadow:0 0 0 3px color-mix(in srgb,var(--purple) 55%,transparent)}
+.algo-target{outline:3px dashed var(--accent);outline-offset:-4px}
+.algo-path{background:var(--gold)!important;color:#3a2c00!important;box-shadow:0 0 16px var(--gold);border-color:var(--gold)}
+@keyframes pulse{50%{box-shadow:0 0 0 7px color-mix(in srgb,var(--orange) 10%,transparent)}}
+#note{min-height:74px;font-size:15px}
+#note b{color:var(--accent)}
+.queue{display:flex;flex-wrap:wrap;gap:6px;min-height:34px;align-items:center}
+.chip{background:var(--open);border:1px solid var(--border);border-radius:7px;padding:4px 9px;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.chip.head{background:var(--accent);color:#fff;border-color:var(--accent)}
+.queue .empty{color:var(--muted);font-style:italic}
+.stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat{background:var(--open);border:1px solid var(--border);border-radius:9px;padding:8px 12px;flex:1;min-width:90px}
+.stat span{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.stat b{font-size:22px;color:var(--green)}
+#code{background:#0b1120;border:1px solid var(--border);border-radius:10px;padding:10px 6px;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;overflow:auto}
+.codeline{padding:2px 10px;white-space:pre;border-radius:5px;color:#aab6cc}
+.codeline .ln{display:inline-block;width:22px;color:#475472;user-select:none}
+.codeline.hot{background:color-mix(in srgb,var(--accent) 22%,transparent);color:#fff}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;font-size:13px;color:var(--muted)}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;margin-right:5px;vertical-align:-2px}
+.controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px}
+.controls input[type=range]{accent-color:var(--accent)}
+#scrub{flex:1;min-width:160px}
+#progress{font-variant-numeric:tabular-nums;color:var(--muted);font-size:14px;min-width:96px;text-align:right}
+.barwrap{height:5px;background:var(--open);border-radius:3px;overflow:hidden;margin-top:10px}
+#bar{height:100%;width:0;background:var(--accent);transition:width .2s}
+.foot{margin-top:30px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <div class="hbar">
+    <span class="tag">BFS</span>
+    <h1>994. Rotting Oranges <small>· multi-source BFS</small></h1>
+    <a class="btn" href="index.html">← all</a>
+    <a class="btn" target="_blank" href="https://leetcode.com/problems/rotting-oranges/">LeetCode ↗</a>
+    <button class="btn" id="theme">◐</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="intro">
+    <h2>How many minutes until everything rots?</h2>
+    <p>Each minute, every <b>rotten</b> orange (2) rots its fresh (1) neighbours. Empty cells (0)
+    are gaps. Return the minutes until no fresh orange remains, or <b>-1</b> if some can never rot.</p>
+  </div>
+
+  <div class="idea">
+    <b>The BFS idea →</b> This is BFS with <b>many starting points at once</b>. Put <i>all</i>
+    rotten oranges into the queue at minute 0. Then BFS outward: everything you reach on the
+    next wave rots at <b>minute+1</b>. Because BFS explores level by level, the wave number
+    <i>is</i> the elapsed time. The answer is the last minute anything rots.
+  </div>
+
+  <div class="stage">
+    <div class="panel">
+      <h3>Grid <span style="font-weight:400;text-transform:none;letter-spacing:0">(number = minute it rotted)</span></h3>
+      <div id="grid"></div>
+      <div class="legend">
+        <span><i style="background:var(--green)"></i>fresh (1)</span>
+        <span><i style="background:var(--orange)"></i>rotten (2)</span>
+        <span><i style="background:var(--open)"></i>empty (0)</span>
+        <span><i style="background:var(--orange);box-shadow:0 0 0 2px #fff inset"></i>rotting this wave</span>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>What's happening</h3>
+      <div id="note"></div>
+      <h3 style="margin-top:16px">Queue (FIFO →) <span style="font-weight:400;text-transform:none">cell · minute</span></h3>
+      <div class="queue" id="queue"></div>
+      <h3 style="margin-top:16px">Counters</h3>
+      <div class="stats" id="stats"></div>
+      <h3 style="margin-top:16px">Code</h3>
+      <div id="code"></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="reset">⟲ Reset</button>
+    <button class="btn" id="back">◀ Step</button>
+    <button class="btn primary" id="play">▶ Play</button>
+    <button class="btn" id="fwd">Step ▶</button>
+    <input type="range" id="scrub" min="0" value="0">
+    <label style="color:var(--muted);font-size:13px">speed
+      <input type="range" id="speed" min="120" max="1200" step="60" value="640">
+    </label>
+    <span id="progress"></span>
+  </div>
+  <div class="barwrap"><div id="bar"></div></div>
+
+  <div class="foot">
+    <b>Complexity:</b> O(rows × cols) time and space. Every orange is enqueued once. ·
+    <b>Key trick:</b> seed the queue with all sources before the loop — same pattern as 01 Matrix (542),
+    Walls and Gates (286), Map of Highest Peak (1765).
+  </div>
+</div>
+
+<script>
+/* ---------- problem-specific config ---------- */
+const CONFIG = {
+  grid: [
+    [2,1,1,1,1],
+    [1,1,0,0,1],
+    [1,0,0,1,1],
+    [1,1,1,1,2],
+  ],
+  code: [
+    "def orangesRotting(grid):",
+    "    q = deque(); fresh = 0",
+    "    for r,c in all_cells:",
+    "        if grid[r][c]==2: q.append((r,c,0))   # source",
+    "        elif grid[r][c]==1: fresh += 1",
+    "    minutes = 0",
+    "    while q:",
+    "        r, c, t = q.popleft()",
+    "        minutes = max(minutes, t)",
+    "        for dr,dc in [(-1,0),(1,0),(0,-1),(0,1)]:",
+    "            nr, nc = r+dr, c+dc",
+    "            if ok(nr,nc) and grid[nr][nc]==1:",
+    "                grid[nr][nc]=2; fresh -= 1",
+    "                q.append((nr, nc, t+1))",
+    "    return minutes if fresh==0 else -1",
+  ],
+};
+
+function buildFrames(){
+  const raw = CONFIG.grid, R = raw.length, C = raw[0].length;
+  const baseOf = v => v===2 ? 'rotten' : v===1 ? 'fresh' : 'empty';
+  const hueFor = t => (22 + t*34) % 360;
+  let st = raw.map(row => row.map(v => ({base:baseOf(v), algo:'', label:null, hue:null})));
+  const DIRS = [[-1,0],[1,0],[0,-1],[0,1]];
+  const frames = [];
+  let minutes = 0, fresh = 0;
+  let q = [];
+  const snap = (line, note) => frames.push({
+    state: st.map(row => row.map(c => ({...c}))),
+    queue: q.map(x => [x[0], x[1], x[2]]),
+    line, note, stats:{minute: minutes, 'fresh left': fresh}
+  });
+
+  for(let r=0;r<R;r++) for(let c=0;c<C;c++){
+    if(raw[r][c]===2){ q.push([r,c,0]); st[r][c].label=0; st[r][c].hue=hueFor(0); st[r][c].algo='frontier'; }
+    else if(raw[r][c]===1) fresh++;
+  }
+  snap(4, `Setup: drop <b>all ${q.length} rotten oranges</b> into the queue at minute 0 (orange outline). There are <b>${fresh} fresh</b> oranges to rot. This "many sources at once" seeding is what makes multi-source BFS work.`);
+
+  while(q.length){
+    const [cr,cc,t] = q.shift();
+    st[cr][cc].algo='current';
+    minutes = Math.max(minutes, t);
+    snap(8, `Pop <b>(${cr},${cc})</b> rotted at minute <b>${t}</b>. Elapsed time so far = ${minutes}. Now spread to its fresh neighbours.`);
+    let spread = 0;
+    for(const [dr,dc] of DIRS){
+      const nr=cr+dr, nc=cc+dc;
+      if(nr>=0&&nr<R&&nc>=0&&nc<C&&st[nr][nc].base==='fresh'){
+        st[nr][nc].base='rotten'; st[nr][nc].label=t+1; st[nr][nc].hue=hueFor(t+1); st[nr][nc].algo='frontier';
+        fresh--; q.push([nr,nc,t+1]); spread++;
+      }
+    }
+    st[cr][cc].algo='visited';
+    snap(13, spread
+      ? `Rotted <b>${spread}</b> fresh neighbour${spread>1?'s':''} → they join the queue stamped minute <b>${t+1}</b>. Fresh left: <b>${fresh}</b>.`
+      : `No fresh neighbours here. Fresh left: <b>${fresh}</b>.`);
+  }
+  const ans = fresh===0 ? minutes : -1;
+  snap(14, fresh===0
+    ? `Queue empty and <b>0 fresh</b> remain → answer is <b>${ans} minutes</b>. 🎉`
+    : `Queue empty but <b>${fresh} fresh</b> can't be reached → answer is <b>-1</b>.`);
+  return frames;
+}
+
+/* ---------- generic runtime (shared across pages) ---------- */
+const $ = s => document.querySelector(s);
+const ICONS = {water:'', land:'', open:'·', empty:'·', blocked:'', fresh:'', rotten:''};
+const esc = s => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const frames = buildFrames();
+let idx = 0, playing = false, timer = null;
+$('#scrub').max = frames.length - 1;
+
+function cellEl(cell){
+  const d = document.createElement('div');
+  d.className = 'cell base-' + cell.base + (cell.algo ? ' algo-'+cell.algo : '');
+  if(cell.hue != null && cell.base==='rotten'){
+    d.style.background = `hsl(${cell.hue} 75% 52%)`; d.style.color = '#1a0f00';
+  }
+  d.textContent = cell.label != null ? cell.label : (ICONS[cell.base]||'');
+  return d;
+}
+function render(){
+  const f = frames[idx];
+  const g = $('#grid'); g.innerHTML='';
+  g.style.gridTemplateColumns = `repeat(${f.state[0].length}, 1fr)`;
+  f.state.forEach(row => row.forEach(c => g.appendChild(cellEl(c))));
+  const q = $('#queue'); q.innerHTML='';
+  if(!f.queue.length) q.innerHTML='<span class="empty">queue is empty</span>';
+  else f.queue.forEach((it,i)=>{
+    const ch=document.createElement('span'); ch.className='chip'+(i===0?' head':'');
+    ch.textContent='('+it[0]+','+it[1]+')'+(it[2]!=null?' · t'+it[2]:'');
+    q.appendChild(ch);
+  });
+  const s = $('#stats'); s.innerHTML='';
+  for(const [k,v] of Object.entries(f.stats))
+    s.insertAdjacentHTML('beforeend', `<div class="stat"><span>${k}</span><b>${v}</b></div>`);
+  const code = $('#code'); code.innerHTML='';
+  CONFIG.code.forEach((ln,i)=>{
+    code.insertAdjacentHTML('beforeend',
+      `<div class="codeline${i===f.line?' hot':''}"><span class="ln">${i+1}</span>${esc(ln||' ')}</div>`);
+  });
+  $('#note').innerHTML = f.note;
+  $('#progress').textContent = `step ${idx+1} / ${frames.length}`;
+  $('#scrub').value = idx;
+  $('#bar').style.width = (idx/(frames.length-1)*100)+'%';
+}
+function go(i){ idx = Math.max(0, Math.min(frames.length-1, i)); render(); }
+function stop(){ playing=false; clearInterval(timer); $('#play').textContent='▶ Play'; $('#play').classList.add('primary'); }
+function play(){
+  if(idx>=frames.length-1) idx=0;
+  playing=true; $('#play').textContent='⏸ Pause'; $('#play').classList.remove('primary');
+  clearInterval(timer);
+  timer=setInterval(()=>{ if(idx>=frames.length-1){stop();return;} go(idx+1); }, +$('#speed').value);
+}
+$('#play').onclick = ()=> playing ? stop() : play();
+$('#fwd').onclick = ()=>{ stop(); go(idx+1); };
+$('#back').onclick = ()=>{ stop(); go(idx-1); };
+$('#reset').onclick = ()=>{ stop(); go(0); };
+$('#scrub').oninput = e =>{ stop(); go(+e.target.value); };
+$('#speed').oninput = ()=>{ if(playing) play(); };
+document.onkeydown = e =>{
+  if(e.key==='ArrowRight'){stop();go(idx+1);} if(e.key==='ArrowLeft'){stop();go(idx-1);}
+  if(e.key===' '){e.preventDefault();playing?stop():play();}
+};
+const themeBtn = $('#theme');
+themeBtn.onclick = ()=>{
+  const t = document.documentElement.dataset.theme==='dark'?'light':'dark';
+  document.documentElement.dataset.theme=t; localStorage.bfsTheme=t;
+};
+if(localStorage.bfsTheme) document.documentElement.dataset.theme = localStorage.bfsTheme;
+render();
+</script>
+</body>
+</html>

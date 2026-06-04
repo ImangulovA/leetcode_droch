@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BFS · 200 Number of Islands</title>
+<style>
+:root{
+  --bg:#0a0e1a; --card:#151d30; --text:#e6edf7; --muted:#8595ad;
+  --accent:#1877F2; --green:#02e2ac; --orange:#f59e0b; --purple:#a855f7; --gold:#ffd33d;
+  --water:#10204a; --land:#c9b896; --open:#1b2538; --blocked:#27324a;
+  --border:#243049;
+}
+[data-theme="light"]{
+  --bg:#f5f7fb; --card:#ffffff; --text:#0c1426; --muted:#5a6b85;
+  --water:#bcd2ff; --land:#e3d3a8; --open:#eef2f9; --blocked:#c3cde0; --border:#dbe3f0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5;padding-bottom:60px}
+a{color:var(--accent);text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.hbar{display:flex;align-items:center;gap:14px;padding:14px 20px;max-width:1180px;margin:0 auto}
+.hbar .tag{background:var(--accent);color:#fff;font-weight:800;border-radius:7px;padding:3px 9px;font-size:13px}
+.hbar h1{font-size:17px;font-weight:700;flex:1}
+.hbar h1 small{color:var(--muted);font-weight:500}
+.btn{background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:8px 12px;font-weight:600;cursor:pointer;font-size:14px;transition:.15s}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.intro{margin:26px 0 18px}
+.intro h2{font-size:24px;margin-bottom:8px}
+.intro p{color:var(--muted);max-width:760px}
+.idea{background:var(--card);border:1px solid var(--border);border-left:4px solid var(--green);border-radius:12px;padding:16px 18px;margin:18px 0}
+.idea b{color:var(--green)}
+.stage{display:grid;grid-template-columns:1.1fr .9fr;gap:20px;margin-top:8px}
+@media(max-width:900px){.stage{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
+.panel h3{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:10px}
+#grid{display:grid;gap:6px}
+.cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;font-weight:800;font-size:clamp(11px,2.2vw,18px);border:2px solid transparent;transition:background .25s,transform .15s,box-shadow .25s;position:relative}
+.base-water{background:var(--water);color:#6f8fd0}
+.base-land{background:var(--land);color:#2a2118}
+.base-open{background:var(--open);color:var(--muted)}
+.base-empty{background:var(--open);color:var(--muted)}
+.base-blocked{background:var(--blocked);color:#6679a0}
+.base-fresh{background:var(--green);color:#03301f}
+.base-rotten{background:var(--orange);color:#3a2300}
+.algo-frontier{border-color:var(--orange);box-shadow:0 0 0 3px color-mix(in srgb,var(--orange) 35%,transparent);animation:pulse 1.1s infinite}
+.algo-current{border-color:var(--accent);box-shadow:0 0 18px var(--accent);transform:scale(1.07);z-index:2}
+.algo-visited{filter:saturate(.85)}
+.algo-source{border-color:var(--purple);box-shadow:0 0 0 3px color-mix(in srgb,var(--purple) 55%,transparent)}
+.algo-target{outline:3px dashed var(--accent);outline-offset:-4px}
+.algo-path{background:var(--gold)!important;color:#3a2c00!important;box-shadow:0 0 16px var(--gold);border-color:var(--gold)}
+@keyframes pulse{50%{box-shadow:0 0 0 7px color-mix(in srgb,var(--orange) 10%,transparent)}}
+#note{min-height:74px;font-size:15px}
+#note b{color:var(--accent)}
+.queue{display:flex;flex-wrap:wrap;gap:6px;min-height:34px;align-items:center}
+.chip{background:var(--open);border:1px solid var(--border);border-radius:7px;padding:4px 9px;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.chip.head{background:var(--accent);color:#fff;border-color:var(--accent)}
+.queue .empty{color:var(--muted);font-style:italic}
+.stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat{background:var(--open);border:1px solid var(--border);border-radius:9px;padding:8px 12px;flex:1;min-width:90px}
+.stat span{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.stat b{font-size:22px;color:var(--green)}
+#code{background:#0b1120;border:1px solid var(--border);border-radius:10px;padding:10px 6px;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;overflow:auto}
+[data-theme="light"] #code{background:#0b1120;color:#dfe7f5}
+.codeline{padding:2px 10px;white-space:pre;border-radius:5px;color:#aab6cc}
+.codeline .ln{display:inline-block;width:22px;color:#475472;user-select:none}
+.codeline.hot{background:color-mix(in srgb,var(--accent) 22%,transparent);color:#fff}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;font-size:13px;color:var(--muted)}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;margin-right:5px;vertical-align:-2px}
+.controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px}
+.controls input[type=range]{accent-color:var(--accent)}
+#scrub{flex:1;min-width:160px}
+#progress{font-variant-numeric:tabular-nums;color:var(--muted);font-size:14px;min-width:96px;text-align:right}
+.barwrap{height:5px;background:var(--open);border-radius:3px;overflow:hidden;margin-top:10px}
+#bar{height:100%;width:0;background:var(--accent);transition:width .2s}
+.foot{margin-top:30px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <div class="hbar">
+    <span class="tag">BFS</span>
+    <h1>200. Number of Islands <small>· grid flood-fill</small></h1>
+    <a class="btn" href="index.html">← all</a>
+    <a class="btn" target="_blank" href="https://leetcode.com/problems/number-of-islands/">LeetCode ↗</a>
+    <button class="btn" id="theme">◐</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="intro">
+    <h2>Count the islands</h2>
+    <p>You're given a grid of <b>land (1)</b> and <b>water (0)</b>. An island is a clump of
+    land connected up/down/left/right. Count how many separate islands there are.</p>
+  </div>
+
+  <div class="idea">
+    <b>The BFS idea →</b> Walk the grid cell by cell. The first time you step onto land you
+    haven't seen, that's a <b>new island</b>: count it, then run BFS from there to "flood" the
+    entire connected blob so you never count it again. The queue holds the cells whose
+    neighbours you still need to explore. BFS spreads outward like spilled water.
+  </div>
+
+  <div class="stage">
+    <div class="panel">
+      <h3>Grid</h3>
+      <div id="grid"></div>
+      <div class="legend">
+        <span><i style="background:var(--land)"></i>land (unseen)</span>
+        <span><i style="background:var(--water)"></i>water</span>
+        <span><i style="background:var(--orange)"></i>in queue (frontier)</span>
+        <span><i style="background:var(--accent)"></i>current</span>
+        <span><i style="background:#7c5cff"></i>flooded island</span>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>What's happening</h3>
+      <div id="note"></div>
+      <h3 style="margin-top:16px">Queue (FIFO →)</h3>
+      <div class="queue" id="queue"></div>
+      <h3 style="margin-top:16px">Counters</h3>
+      <div class="stats" id="stats"></div>
+      <h3 style="margin-top:16px">Code</h3>
+      <div id="code"></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="reset">⟲ Reset</button>
+    <button class="btn" id="back">◀ Step</button>
+    <button class="btn primary" id="play">▶ Play</button>
+    <button class="btn" id="fwd">Step ▶</button>
+    <input type="range" id="scrub" min="0" value="0">
+    <label style="color:var(--muted);font-size:13px">speed
+      <input type="range" id="speed" min="120" max="1200" step="60" value="640">
+    </label>
+    <span id="progress"></span>
+  </div>
+  <div class="barwrap"><div id="bar"></div></div>
+
+  <div class="foot">
+    <b>Complexity:</b> O(rows × cols) time, O(rows × cols) space (visited + queue). Each cell is
+    enqueued and dequeued at most once. · Same idea solves: Max Area of Island (695), Flood Fill (733).
+  </div>
+</div>
+
+<script>
+/* ---------- problem-specific config ---------- */
+const CONFIG = {
+  grid: [
+    ['1','1','0','0','1','0'],
+    ['1','0','0','1','1','0'],
+    ['0','0','1','0','0','0'],
+    ['0','1','1','0','1','1'],
+    ['0','0','0','0','1','0'],
+  ],
+  code: [
+    "def numIslands(grid):",
+    "    count = 0",
+    "    for r in range(rows):",
+    "        for c in range(cols):",
+    "            if grid[r][c]=='1' and not seen[r][c]:",
+    "                count += 1          # new island",
+    "                bfs(r, c)           # flood it",
+    "    return count",
+    "",
+    "def bfs(sr, sc):",
+    "    q = deque([(sr,sc)]); seen[sr][sc]=True",
+    "    while q:",
+    "        r, c = q.popleft()",
+    "        for dr,dc in [(-1,0),(1,0),(0,-1),(0,1)]:",
+    "            nr, nc = r+dr, c+dc",
+    "            if ok(nr,nc) and grid[nr][nc]=='1' and not seen[nr][nc]:",
+    "                seen[nr][nc]=True; q.append((nr,nc))",
+  ],
+};
+
+function buildFrames(){
+  const raw = CONFIG.grid, R = raw.length, C = raw[0].length;
+  const baseOf = v => v==='1' ? 'land' : 'water';
+  let st = raw.map(row => row.map(v => ({base:baseOf(v), algo:'', label:null, hue:null})));
+  const seen = raw.map(row => row.map(()=>false));
+  const DIRS = [[-1,0],[1,0],[0,-1],[0,1]];
+  const frames = [];
+  let count = 0;
+  const snap = (line, note, q=[]) => frames.push({
+    state: st.map(row => row.map(c => ({...c}))),
+    queue: q.map(x => [x[0], x[1]]),
+    line, note, stats:{islands: count}
+  });
+
+  snap(1, "Start with <b>0 islands</b>. We scan the grid left-to-right, top-to-bottom, looking for land we haven't visited yet.");
+  for(let r=0;r<R;r++) for(let c=0;c<C;c++){
+    if(raw[r][c]==='1' && !seen[r][c]){
+      count++;
+      const hue = (count*72 + 200) % 360;
+      const q = [[r,c]];
+      seen[r][c]=true; st[r][c].algo='frontier'; st[r][c].hue=hue;
+      snap(5, `Hit unvisited land at <b>(${r},${c})</b> → that's <b>island #${count}</b>. Seed the queue with it and start BFS to flood the whole blob.`, q);
+      while(q.length){
+        const [cr,cc] = q.shift();
+        st[cr][cc].algo='current'; st[cr][cc].hue=hue;
+        snap(12, `Pop the front of the queue: <b>(${cr},${cc})</b>. Check its 4 neighbours.`, [[cr,cc],...q]);
+        for(const [dr,dc] of DIRS){
+          const nr=cr+dr, nc=cc+dc;
+          if(nr>=0&&nr<R&&nc>=0&&nc<C&&raw[nr][nc]==='1'&&!seen[nr][nc]){
+            seen[nr][nc]=true; st[nr][nc].algo='frontier'; st[nr][nc].hue=hue;
+            q.push([nr,nc]);
+          }
+        }
+        st[cr][cc].algo='visited';
+        snap(16, `Unvisited land neighbours are marked seen and pushed (orange = waiting in queue). <b>(${cr},${cc})</b> is done.`, q);
+      }
+      snap(11, `Queue empty → island #${count} is fully flooded. Back to scanning.`);
+    }
+  }
+  snap(7, `Scan complete. Connected landmasses found: <b>${count} islands</b>. 🎉`);
+  return frames;
+}
+
+/* ---------- generic runtime (shared across pages) ---------- */
+const $ = s => document.querySelector(s);
+const ICONS = {water:'', land:'', open:'', empty:'·', blocked:'', fresh:'', rotten:''};
+const esc = s => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const frames = buildFrames();
+let idx = 0, playing = false, timer = null;
+$('#scrub').max = frames.length - 1;
+
+function cellEl(cell){
+  const d = document.createElement('div');
+  d.className = 'cell base-' + cell.base + (cell.algo ? ' algo-'+cell.algo : '');
+  if(cell.hue != null && (cell.algo==='visited'||cell.algo==='current'||cell.algo==='frontier')){
+    d.style.background = `hsl(${cell.hue} 62% 55%)`; d.style.color = '#0b1020';
+  }
+  d.textContent = cell.label != null ? cell.label : (ICONS[cell.base]||'');
+  return d;
+}
+function render(){
+  const f = frames[idx];
+  const g = $('#grid'); g.innerHTML='';
+  g.style.gridTemplateColumns = `repeat(${f.state[0].length}, 1fr)`;
+  f.state.forEach(row => row.forEach(c => g.appendChild(cellEl(c))));
+  const q = $('#queue'); q.innerHTML='';
+  if(!f.queue.length) q.innerHTML='<span class="empty">queue is empty</span>';
+  else f.queue.forEach((it,i)=>{
+    const ch=document.createElement('span'); ch.className='chip'+(i===0?' head':'');
+    ch.textContent='('+it[0]+','+it[1]+')'+(it[2]!=null?' · t'+it[2]:'');
+    q.appendChild(ch);
+  });
+  const s = $('#stats'); s.innerHTML='';
+  for(const [k,v] of Object.entries(f.stats))
+    s.insertAdjacentHTML('beforeend', `<div class="stat"><span>${k}</span><b>${v}</b></div>`);
+  const code = $('#code'); code.innerHTML='';
+  CONFIG.code.forEach((ln,i)=>{
+    code.insertAdjacentHTML('beforeend',
+      `<div class="codeline${i===f.line?' hot':''}"><span class="ln">${i+1}</span>${esc(ln||' ')}</div>`);
+  });
+  $('#note').innerHTML = f.note;
+  $('#progress').textContent = `step ${idx+1} / ${frames.length}`;
+  $('#scrub').value = idx;
+  $('#bar').style.width = (idx/(frames.length-1)*100)+'%';
+}
+function go(i){ idx = Math.max(0, Math.min(frames.length-1, i)); render(); }
+function stop(){ playing=false; clearInterval(timer); $('#play').textContent='▶ Play'; $('#play').classList.add('primary'); }
+function play(){
+  if(idx>=frames.length-1) idx=0;
+  playing=true; $('#play').textContent='⏸ Pause'; $('#play').classList.remove('primary');
+  clearInterval(timer);
+  timer=setInterval(()=>{ if(idx>=frames.length-1){stop();return;} go(idx+1); }, +$('#speed').value);
+}
+$('#play').onclick = ()=> playing ? stop() : play();
+$('#fwd').onclick = ()=>{ stop(); go(idx+1); };
+$('#back').onclick = ()=>{ stop(); go(idx-1); };
+$('#reset').onclick = ()=>{ stop(); go(0); };
+$('#scrub').oninput = e =>{ stop(); go(+e.target.value); };
+$('#speed').oninput = ()=>{ if(playing) play(); };
+document.onkeydown = e =>{
+  if(e.key==='ArrowRight'){stop();go(idx+1);} if(e.key==='ArrowLeft'){stop();go(idx-1);}
+  if(e.key===' '){e.preventDefault();playing?stop():play();}
+};
+const themeBtn = $('#theme');
+themeBtn.onclick = ()=>{
+  const t = document.documentElement.dataset.theme==='dark'?'light':'dark';
+  document.documentElement.dataset.theme=t; localStorage.bfsTheme=t;
+};
+if(localStorage.bfsTheme) document.documentElement.dataset.theme = localStorage.bfsTheme;
+render();
+</script>
+</body>
+</html>
