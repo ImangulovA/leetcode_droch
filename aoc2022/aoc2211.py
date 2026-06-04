@@ -1,3 +1,6 @@
+import sys
+INPUT_PATH = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
+
 test = False
 if test:
     lines = """Monkey 0:
@@ -29,7 +32,7 @@ Monkey 3:
     If false: throw to monkey 1
 """.split('\n')
 else:
-    with open('/Users/dev/Downloads/input (10).txt', 'r') as f:
+    with open(INPUT_PATH, 'r') as f:
         lines = f.readlines()
 
 
@@ -92,7 +95,3 @@ print(queue)
 mj.sort()
 print(mj)
 print(mj[-1]*mj[-2])
-
-
-
-

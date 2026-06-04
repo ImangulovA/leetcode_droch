@@ -1,3 +1,6 @@
+import sys
+INPUT_PATH = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
+
 test = False
 if test:
     lines = """[1,1,3,1,1]
@@ -24,7 +27,7 @@ if test:
 [1,[2,[3,[4,[5,6,7]]]],8,9]
 [1,[2,[3,[4,[5,6,0]]]],8,9]""".split('\n')
 else:
-    with open('/Users/dev/Downloads/input (12).txt', 'r') as f:
+    with open(INPUT_PATH, 'r') as f:
         lines = f.readlines()
 
 #I stole Parser from Reddit, because I HATE WRITING PARSERS
@@ -122,5 +125,3 @@ while allissorted == False:
 div1=(packlist.index(sep1))+1
 div2=(packlist.index(sep2))+1
 print(div1*div2)
-
-

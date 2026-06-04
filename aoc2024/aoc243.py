@@ -1,3 +1,6 @@
+import sys
+INPUT_PATH = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
+
 import re
 s1 = 0
 s2 = 0
@@ -11,7 +14,7 @@ pd = "do\(\)"
 prod = True
 
 if prod:
-    with open('C:/Users/Amal Imangulov/Downloads/input_3.txt', 'r') as f:
+    with open(INPUT_PATH, 'r') as f:
         lines = f.readlines()
 else:
     lines = ["xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))"]

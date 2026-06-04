@@ -1,3 +1,6 @@
+import sys
+INPUT_PATH = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
+
 test = False
 if test:
     lines = """addx 15
@@ -147,7 +150,7 @@ noop
 noop
 noop""".split('\n')
 else:
-    with open('/Users/dev/Downloads/input (9).txt', 'r') as f:
+    with open(INPUT_PATH, 'r') as f:
         lines = f.readlines()
 
 interesting = []

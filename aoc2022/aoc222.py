@@ -1,3 +1,6 @@
+import sys
+INPUT_PATH = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
+
 # a rock b paper c scissors
 # x rock y paper z scissors
 orda = ord('A')
@@ -57,7 +60,7 @@ def match2(p):
 
 s1 = 0
 s2 = 0
-with open('/Users/dev/Downloads/input (1).txt', 'r') as f:
+with open(INPUT_PATH, 'r') as f:
     for line in f:
         if line.strip():  # Skip blank lines.
             scores = match(line.split(' '))

@@ -1,8 +1,11 @@
+import sys
+INPUT_PATH = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
+
 s1 = 0
 s2 = 0
 list_1 = []
 list_2 = []
-with open('C:/Users/Amal Imangulov/Downloads/input.txt', 'r') as f:
+with open(INPUT_PATH, 'r') as f:
     for line in f:
         i,k = list(map(int, line.split('   ')))
         list_1.append(i)

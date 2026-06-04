@@ -1,3 +1,6 @@
+import sys
+INPUT_PATH = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
+
 import math
 sign = lambda x: math.copysign(1, x)
 test = False
@@ -11,7 +14,7 @@ D 10
 L 25
 U 20""".split('\n')
 else:
-    with open('/Users/dev/Downloads/input (8).txt', 'r') as f:
+    with open(INPUT_PATH, 'r') as f:
         lines = f.readlines()
 
 # p1

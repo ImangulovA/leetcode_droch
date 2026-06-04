@@ -1,3 +1,6 @@
+import sys
+INPUT_PATH = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
+
 test = False
 if test:
     lines = """Sabqponm
@@ -6,7 +9,7 @@ accszExk
 acctuvwj
 abdefghi""".split('\n')
 else:
-    with open('/Users/dev/Downloads/input (11).txt', 'r') as f:
+    with open(INPUT_PATH, 'r') as f:
         lines = f.readlines()
 
 # p1

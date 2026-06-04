@@ -1,6 +1,9 @@
+import sys
+INPUT_PATH = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
 
 
-with open('/Users/dev/Downloads/input (6).txt', 'r') as f:
+
+with open(INPUT_PATH, 'r') as f:
   lines = f.readlines()
 
 # lines = """$ cd /
@@ -108,4 +111,3 @@ for d in dirs.keys():
 
 print(p2)
 print(min(p2))
-

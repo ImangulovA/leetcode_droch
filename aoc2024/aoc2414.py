@@ -1,3 +1,6 @@
+import sys
+INPUT_PATH = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
+
 s1 = 0
 s2 = 0
 import re
@@ -11,12 +14,12 @@ import os
 prod = True
 
 # Create the "Output" folder if it doesn't exist
-output_folder = 'C:/Users/Amal Imangulov/Downloads/Output_14'
+output_folder = sys.argv[2] if len(sys.argv) > 2 else 'output_14'
 os.makedirs(output_folder, exist_ok=True)
 x = 101
 y = 103
 if prod:
-    with open('C:/Users/Amal Imangulov/Downloads/input_14.txt', 'r') as f:
+    with open(INPUT_PATH, 'r') as f:
         lines = f.readlines()
 else:
     lines = """p=0,4 v=3,-3

@@ -1,3 +1,6 @@
+import sys
+INPUT_PATH = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
+
 test = False
 import time
 if test:
@@ -12,7 +15,7 @@ Valve HH has flow rate=22; tunnel leads to valve GG
 Valve II has flow rate=0; tunnels lead to valves AA, JJ
 Valve JJ has flow rate=21; tunnel leads to valve II""".split('\n')
 else:
-    with open('/Users/dev/Downloads/input (15).txt', 'r') as f:
+    with open(INPUT_PATH, 'r') as f:
         lines = f.readlines()
 
 # p1
@@ -105,4 +108,3 @@ print(elapsed_time)
 print(vwayopt2(26, svd['AA'],svd['AA'],26, [True for i in range(len(valves))]))
 elapsed_time = time.time() - start_time
 print(elapsed_time)
-

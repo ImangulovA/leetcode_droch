@@ -1,5 +1,8 @@
+import sys
+INPUT_PATH = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
+
 rucksum = 0
-with open('/Users/dev/Downloads/input (2).txt', 'r') as f:
+with open(INPUT_PATH, 'r') as f:
   for line in f:
     if line.strip():  # Skip blank lines.
       firsth = line[:(len(line)//2)]
@@ -11,7 +14,7 @@ with open('/Users/dev/Downloads/input (2).txt', 'r') as f:
         rucksum += ord(common[0]) - ord('A') + 27
       # print(rucksum)
 
-with open('/Users/dev/Downloads/input (2).txt', 'r') as f:
+with open(INPUT_PATH, 'r') as f:
   lines = f.readlines()
 
 rucksum2 = 0

@@ -1,3 +1,6 @@
+import sys
+INPUT_PATH = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
+
 test = False
 if test:
     lines = """Sensor at x=2, y=18: closest beacon is at x=-2, y=15
@@ -15,7 +18,7 @@ Sensor at x=16, y=7: closest beacon is at x=15, y=3
 Sensor at x=14, y=3: closest beacon is at x=15, y=3
 Sensor at x=20, y=1: closest beacon is at x=15, y=3""".split('\n')
 else:
-    with open('/Users/dev/Downloads/input (14).txt', 'r') as f:
+    with open(INPUT_PATH, 'r') as f:
         lines = f.readlines()
 
 # p1
@@ -103,4 +106,3 @@ for k in range(0,lim):
         else:
             print(k,rb,a[i])
             break
-

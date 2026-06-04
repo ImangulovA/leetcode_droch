@@ -1,3 +1,6 @@
+import sys
+INPUT_PATH = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
+
 s1 = 0
 s2 = 0
 
@@ -18,7 +21,7 @@ def reportcheck(arr):
         return False
     return True
 
-with open('C:/Users/Amal Imangulov/Downloads/input_2.txt', 'r') as f:
+with open(INPUT_PATH, 'r') as f:
     for line in f:
         arr = list(map(int, line.split(' ')))
         is_ok = reportcheck(arr)
