@@ -104,6 +104,7 @@ A run through a LeetCode set (problem number in each filename).
 | 205 | [Isomorphic Strings](lc25/205_isomorphic_strings.py) | hashing |
 | 266 | [Palindrome Permutation](lc25/266_palindrome_permutation.py) | hashing |
 | 680 | [Valid Palindrome II](lc25/680_valid_palindrome_ii.py) | two pointers |
+| 1539 | [Kth Missing Positive Number](lc25/1539_kth_missing_positive_number.py) | array / counting gaps |
 | 2530 | [Maximal Score After Applying K Operations](lc25/2530_maximal_score_after_applying_k_operations.py) | greedy / heap |
 
 ### [`lc25/hackerrank_sql/`](lc25/hackerrank_sql)
