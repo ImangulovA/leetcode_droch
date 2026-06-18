@@ -122,9 +122,53 @@ seen = set(starts)
     </a>
   </div>
 
+  <div class="hero" style="padding-top:26px">
+    <h2>And memoization, <span>one cell at a time</span></h2>
+    <p>A different family: recursion that re-asks the same sub-problem over and over. The fix is to
+    write each answer down once and reuse it. Watch the table fill, and watch the cache hits skip work.</p>
+  </div>
+
+  <div class="primer">
+    <h3>The one mental model behind memoization</h3>
+    <p>Memoization is just <b>recursion + a notebook</b>. Some problems have <b>overlapping
+    sub-problems</b>: the plain recursion calls <i>solve(state)</i> for the same <i>state</i> an
+    exponential number of times. So the first time you finish a state, you <b>store</b> the answer
+    in a cache keyed by that state. Every later time it comes up, you <b>read it back</b> and
+    <i>skip the entire subtree</i> underneath. Each state is computed exactly <b>once</b>.</p>
+    <ol>
+      <li><b>Key</b> each sub-problem by its arguments (here: the pair of prefix lengths <i>(i, j)</i>).</li>
+      <li><b>Check</b> the cache first: if <i>memo[key]</i> exists, return it immediately.</li>
+      <li><b>Recurse</b> only on a miss, combining the smaller answers.</li>
+      <li><b>Store</b> the result under its key <i>before returning</i>, so the next caller gets a free lookup.</li>
+    </ol>
+    <div class="tmpl"><span class="c"># the top-down DP skeleton you reuse every time</span>
+memo = {}
+<span class="k">def</span> solve(state):
+    <span class="k">if</span> is_base(state):     <span class="c"># trivial answer, no recursion</span>
+        <span class="k">return</span> base_value(state)
+    <span class="k">if</span> state <span class="k">in</span> memo:       <span class="c"># cache hit: skip the whole subtree</span>
+        <span class="k">return</span> memo[state]
+    memo[state] = combine(solve(s) <span class="k">for</span> s <span class="k">in</span> sub(state))
+    <span class="k">return</span> memo[state]</div>
+  </div>
+
+  <div class="cards">
+    <a class="card" href="72_edit_distance.html">
+      <div class="no" style="color:var(--purple)">72 · HARD</div>
+      <h4>Edit Distance</h4>
+      <p>Fewest inserts/deletes/replaces to match two words. A 2D memo table fills top-down; cache hits skip repeated work.</p>
+      <div class="mini" style="grid-template-columns:repeat(4,15px)">
+        <i style="background:var(--accent)"></i><i style="background:var(--accent)"></i><i style="background:var(--green)"></i><i style="background:var(--open)"></i>
+        <i style="background:var(--accent)"></i><i style="background:var(--green)"></i><i style="background:var(--gold)"></i><i style="background:var(--open)"></i>
+      </div>
+      <span class="pill" style="color:var(--purple);background:color-mix(in srgb,var(--purple) 14%,transparent)">top-down DP · cache hits</span>
+    </a>
+  </div>
+
   <div class="foot">
     Part of <a style="color:var(--accent)" href="https://github.com/ImangulovA/leetcode_droch">leetcode_droch</a>.
-    Tip: <b>seed all sources first</b> for multi-source; <b>mark seen on push</b>, not on pop.
+    Tip: <b>seed all sources first</b> for multi-source BFS; <b>mark seen on push</b>, not on pop.
+    For memoization: <b>check the cache before recursing</b>, and <b>store before returning</b>.
   </div>
 </div>
 <script>
